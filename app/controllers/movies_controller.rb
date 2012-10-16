@@ -10,12 +10,14 @@ class MoviesController < ApplicationController
 
     @all_ratings = Movie.enum_ratings
     
+    do_redirect = false
     if !params[:ratings].nil?
       @ratings_selected = params[:ratings].keys
     elsif !params[:old_ratings].nil?
       @ratings_selected = params[:old_ratings]
     elsif !session[:sess_ratings_selected].nil?
-      @ratings_selected = params[:old_ratings] = session[:sess_ratings_selected]
+      @ratings_selected = session[:sess_ratings_selected]
+      do_redirect = true
     else
       @ratings_selected = @all_ratings
     end
@@ -24,7 +26,11 @@ class MoviesController < ApplicationController
       @order_by = params[:order_by]
     elsif !session[:sess_order_by].nil?
       @order_by = session[:sess_order_by]
-      redirect_to movies_path({:order_by => @order_by})
+      do_redirect = true
+    end
+  
+    if do_redirect
+      redirect_to movies_path({:order_by => @order_by, :old_ratings => @ratings_selected})
     end
 
     if @order_by.nil?
