@@ -7,25 +7,33 @@ class MoviesController < ApplicationController
   end
 
   def index
-    puts "PARAMS INTO index", params
+
     @all_ratings = Movie.enum_ratings
     
     if !params[:ratings].nil?
       @ratings_selected = params[:ratings].keys
     elsif !params[:old_ratings].nil?
       @ratings_selected = params[:old_ratings]
+    elsif !session[:sess_ratings_selected].nil?
+      @ratings_selected = params[:old_ratings] = session[:sess_ratings_selected]
     else
       @ratings_selected = @all_ratings
     end
 
-    puts "selected ratings", @ratings_selected
+    if !params[:order_by].nil?
+      @order_by = params[:order_by]
+    elsif !session[:sess_order_by].nil?
+      @order_by = session[:sess_order_by]
+    end
 
-    if params[:orderby].nil?
+    if @order_by.nil?
       @movies = Movie.find_all_by_rating(@ratings_selected)
     else
-      @movies = Movie.order(params[:orderby]).find_all_by_rating(@ratings_selected)
+      @movies = Movie.order(@order_by).find_all_by_rating(@ratings_selected)
     end
     
+    session[:sess_ratings_selected] = @ratings_selected
+    session[:sess_order_by] = @order_by
 
   end
 
