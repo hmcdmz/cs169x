@@ -24,6 +24,7 @@ class MoviesController < ApplicationController
       @order_by = params[:order_by]
     elsif !session[:sess_order_by].nil?
       @order_by = session[:sess_order_by]
+      redirect_to movies_path({:order_by => @order_by})
     end
 
     if @order_by.nil?
